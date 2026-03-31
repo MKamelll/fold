@@ -5,14 +5,14 @@
 #include <QSizePolicy>
 #include <QStackedWidget>
 #include <QVBoxLayout>
-
+#include <QHBoxLayout>
 #include "pdf.hpp"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     Pdf pdf;
 
     setWindowTitle("fold");
-    resize(860, 640);
+    resize(480, 240);
     stack = new QStackedWidget(this);
     setCentralWidget(stack);
 
@@ -34,41 +34,48 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 void MainWindow::switchToMergePage() { stack->setCurrentWidget(mergePage); }
 
 void MainWindow::setupHomePage() {
-    QGridLayout *layout = new QGridLayout;
-    homePage->setLayout(layout);
-    layout->setColumnStretch(0, 1);
-    layout->setColumnStretch(1, 1);
-    layout->setRowStretch(0, 1);
-    layout->setRowStretch(1, 1);
+    QGridLayout *grid = new QGridLayout;
+    homePage->setLayout(grid);
+    grid->setColumnStretch(0, 1);
+    grid->setColumnStretch(1, 0);
+    grid->setColumnStretch(2, 1);
 
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->setSpacing(20);
     QPushButton *mergeBtn = new QPushButton("Merge PDFs", this);
     QPushButton *splitBtn = new QPushButton("Split PDFs", this);
     QPushButton *extractTextBtn = new QPushButton("Extract Text", this);
 
-    for (auto *btn : {mergeBtn, splitBtn, extractTextBtn}) {
-        btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    }
-
-    layout->addWidget(mergeBtn, 0, 0);
-    layout->addWidget(splitBtn, 0, 1);
-    layout->addWidget(extractTextBtn, 1, 0);
+    vbox->addWidget(mergeBtn);
+    vbox->addWidget(splitBtn);
+    vbox->addWidget(extractTextBtn);
+    grid->addLayout(vbox, 0, 1);
 
     connect(mergeBtn, &QPushButton::clicked, this,
             &MainWindow::switchToMergePage);
 }
 
 void MainWindow::setUpMergePage() {
-    QPushButton *add_files = new QPushButton("Add Files", this);
+    QPushButton *addFiles = new QPushButton("Add Files", this);
     QVBoxLayout *layout = new QVBoxLayout;
+    fileList = new QListWidget;
     mergePage->setLayout(layout);
-    layout->addWidget(add_files);
-    layout->setAlignment(Qt::AlignCenter);
-    connect(add_files, &QPushButton::clicked, this, &MainWindow::openFiles);
+
+    layout->addWidget(fileList);
+    layout->addWidget(addFiles);
+
+    connect(addFiles, &QPushButton::clicked, this, &MainWindow::openFiles);
 }
 
 void MainWindow::openFiles() {
     QStringList files = QFileDialog::getOpenFileNames(
         this, "Select Files", QDir::homePath(), "PDF Files (*.pdf)");
+
+    for (auto &file : files) {
+        fileList->addItem(file);
+    }
+    fileList->setDragDropMode(QAbstractItemView::InternalMove);
+    fileList->setDefaultDropAction(Qt::MoveAction);
 }
 
 MainWindow::~MainWindow() {}
