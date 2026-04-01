@@ -1,27 +1,42 @@
 #pragma once
 
-#include <QMainWindow>
-#include <QStackedWidget>
 #include <QListWidget>
+#include <QMainWindow>
+#include <QPushButton>
+#include <QStackedWidget>
 
 class MainWindow : public QMainWindow {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    void setupHomePage();
-    void setUpMergePage();
-    ~MainWindow();
+  MainWindow(QWidget *parent = nullptr);
+  void setupHomePage();
+  void setUpMergePage();
+  ~MainWindow();
 
 private slots:
-    void switchToMergePage();
-    void openFiles();
+  void switchToMergePage();
+  void openFiles();
 
 private:
-    QWidget *homePage;
-    QWidget *mergePage;
-    QWidget *splitPage;
-    QWidget *extractTextPage;
-    QStackedWidget *stack;
-    QListWidget *fileList;
+  QWidget *homePage;
+  QWidget *mergePage;
+  QWidget *splitPage;
+  QWidget *extractTextPage;
+  QPushButton *mergeBtn;
+  QPushButton *splitBtn;
+  QPushButton *compressBtn;
+  QPushButton *editBtn;
+  QPushButton *signBtn;
+  QPushButton *convertBtn;
+  QPushButton *fromImagesBtn;
+  QPushButton *extractImagesBtn;
+  QPushButton *lockBtn;
+  QPushButton *unLockBtn;
+  QPushButton *rotatePagesBtn;
+  QPushButton *removePagesBtn;
+  QPushButton *printBtn;
+  QPushButton *extractTextBtn;
+  QStackedWidget *stack;
+  QListWidget *fileList;
 };

@@ -1,12 +1,12 @@
 #include "mainwindow.hpp"
+#include "pdf.hpp"
 #include <QFileDialog>
 #include <QGridLayout>
+#include <QHBoxLayout>
 #include <QPushButton>
 #include <QSizePolicy>
 #include <QStackedWidget>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
-#include "pdf.hpp"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     Pdf pdf;
@@ -36,20 +36,40 @@ void MainWindow::switchToMergePage() { stack->setCurrentWidget(mergePage); }
 void MainWindow::setupHomePage() {
     QGridLayout *grid = new QGridLayout;
     homePage->setLayout(grid);
-    grid->setColumnStretch(0, 1);
-    grid->setColumnStretch(1, 0);
-    grid->setColumnStretch(2, 1);
 
-    QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->setSpacing(20);
-    QPushButton *mergeBtn = new QPushButton("Merge PDFs", this);
-    QPushButton *splitBtn = new QPushButton("Split PDFs", this);
-    QPushButton *extractTextBtn = new QPushButton("Extract Text", this);
+    mergeBtn = new QPushButton("Merge PDFs", this);
+    splitBtn = new QPushButton("Split PDF", this);
+    editBtn = new QPushButton("Edit PDF", this);
+    signBtn = new QPushButton("Sign PDF", this);
+    convertBtn = new QPushButton("Convert PDF", this);
+    fromImagesBtn = new QPushButton("Images to PDF", this);
+    extractImagesBtn = new QPushButton("Extract images from PDF", this);
+    lockBtn = new QPushButton("Lock PDF", this);
+    unLockBtn = new QPushButton("Unlock PDF", this);
+    rotatePagesBtn = new QPushButton("Rotate pages in PDF", this);
+    removePagesBtn = new QPushButton("Remove pages from PDF", this);
+    printBtn = new QPushButton("Print PDF", this);
+    compressBtn = new QPushButton("Compress PDF", this);
+    extractTextBtn = new QPushButton("Extract Text", this);
 
-    vbox->addWidget(mergeBtn);
-    vbox->addWidget(splitBtn);
-    vbox->addWidget(extractTextBtn);
-    grid->addLayout(vbox, 0, 1);
+    grid->addWidget(mergeBtn, 0, 0);
+    grid->addWidget(splitBtn, 0, 1);
+    grid->addWidget(editBtn, 0, 2);
+
+    grid->addWidget(signBtn, 1, 0);
+    grid->addWidget(convertBtn, 1, 1);
+    grid->addWidget(fromImagesBtn, 1, 2);
+
+    grid->addWidget(extractImagesBtn, 2, 0);
+    grid->addWidget(lockBtn, 2, 1);
+    grid->addWidget(unLockBtn, 2, 2);
+
+    grid->addWidget(rotatePagesBtn, 3, 0);
+    grid->addWidget(removePagesBtn, 3, 1);
+    grid->addWidget(printBtn, 3, 2);
+
+    grid->addWidget(compressBtn, 4, 0);
+    grid->addWidget(extractTextBtn, 4, 1);
 
     connect(mergeBtn, &QPushButton::clicked, this,
             &MainWindow::switchToMergePage);
