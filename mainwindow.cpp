@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("fold");
     resize(480, 240);
     stack = new QStackedWidget(this);
+
     setCentralWidget(stack);
 
     homePage = new QWidget;
@@ -26,12 +27,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     stack->addWidget(splitPage);
     stack->addWidget(extractTextPage);
 
+    backToHomeBtn = new QPushButton("Home", this);
+    connect(backToHomeBtn, &QPushButton::clicked, this,
+            [=]() { stack->setCurrentWidget(homePage); });
+
     setupHomePage();
     setUpMergePage();
     stack->setCurrentWidget(homePage);
 }
-
-void MainWindow::switchToMergePage() { stack->setCurrentWidget(mergePage); }
 
 void MainWindow::setupHomePage() {
     QGridLayout *grid = new QGridLayout;
@@ -72,30 +75,48 @@ void MainWindow::setupHomePage() {
     grid->addWidget(extractTextBtn, 4, 1);
 
     connect(mergeBtn, &QPushButton::clicked, this,
-            &MainWindow::switchToMergePage);
+            [=]() { stack->setCurrentWidget(mergePage); });
 }
 
 void MainWindow::setUpMergePage() {
-    QPushButton *addFiles = new QPushButton("Add Files", this);
+    addFilesBtn = new QPushButton("Add", this);
+    removeFilesBtn = new QPushButton("Del", this);
+    mergeFilesBtn = new QPushButton("Merge", this);
+    mergeFilesBtn->setDisabled(true);
+
+    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->addWidget(mergeFilesBtn);
+    hbox->addStretch(1);
+    hbox->addWidget(backToHomeBtn);
+    hbox->addWidget(addFilesBtn);
+    hbox->addWidget(removeFilesBtn);
+
     QVBoxLayout *layout = new QVBoxLayout;
     fileList = new QListWidget;
+
+    connect(fileList->model(), &QAbstractItemModel::rowsInserted,
+            [=]() { mergeFilesBtn->setEnabled(fileList->count() > 0); });
+
+    connect(fileList->model(), &QAbstractItemModel::rowsRemoved,
+            [=]() { mergeFilesBtn->setEnabled(fileList->count() > 0); });
+
     mergePage->setLayout(layout);
 
     layout->addWidget(fileList);
-    layout->addWidget(addFiles);
+    layout->addLayout(hbox);
 
-    connect(addFiles, &QPushButton::clicked, this, &MainWindow::openFiles);
+    connect(addFilesBtn, &QPushButton::clicked, this, [=]() {
+        QStringList files = QFileDialog::getOpenFileNames(
+            this, "Select Files", QDir::homePath(), "PDF Files (*.pdf)");
+
+        for (auto &file : files) {
+            fileList->addItem(file);
+        }
+        fileList->setDragDropMode(QAbstractItemView::InternalMove);
+        fileList->setDefaultDropAction(Qt::MoveAction);
+    });
 }
 
-void MainWindow::openFiles() {
-    QStringList files = QFileDialog::getOpenFileNames(
-        this, "Select Files", QDir::homePath(), "PDF Files (*.pdf)");
-
-    for (auto &file : files) {
-        fileList->addItem(file);
-    }
-    fileList->setDragDropMode(QAbstractItemView::InternalMove);
-    fileList->setDefaultDropAction(Qt::MoveAction);
-}
+void MainWindow::mergeFiles() {}
 
 MainWindow::~MainWindow() {}
