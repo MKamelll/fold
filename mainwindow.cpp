@@ -115,6 +115,9 @@ void MainWindow::setUpMergePage() {
         fileList->setDragDropMode(QAbstractItemView::InternalMove);
         fileList->setDefaultDropAction(Qt::MoveAction);
     });
+
+    connect(removeFilesBtn, &QPushButton::clicked, this,
+            [=]() { delete fileList->takeItem(fileList->currentRow()); });
 }
 
 void MainWindow::mergeFiles() {}
