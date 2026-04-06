@@ -1,5 +1,4 @@
 #include "mainwindow.hpp"
-#include "pdf.hpp"
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QHBoxLayout>
@@ -7,9 +6,14 @@
 #include <QSizePolicy>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <QDialog>
+#include <QLabel>
+#include <QProgressDialog>
+#include <podofo/podofo.h>
+#include <QThread>
+#include <QApplication>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-    Pdf pdf;
 
     setWindowTitle("fold");
     resize(480, 240);
@@ -81,11 +85,11 @@ void MainWindow::setupHomePage() {
 void MainWindow::setUpMergePage() {
     addFilesBtn = new QPushButton("Add", this);
     removeFilesBtn = new QPushButton("Del", this);
-    mergeFilesBtn = new QPushButton("Merge", this);
-    mergeFilesBtn->setDisabled(true);
+    doMergeBtn = new QPushButton("Merge", this);
+    doMergeBtn->setDisabled(true);
 
     QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addWidget(mergeFilesBtn);
+    hbox->addWidget(doMergeBtn);
     hbox->addStretch(1);
     hbox->addWidget(backToHomeBtn);
     hbox->addWidget(addFilesBtn);
@@ -95,10 +99,10 @@ void MainWindow::setUpMergePage() {
     fileList = new QListWidget;
 
     connect(fileList->model(), &QAbstractItemModel::rowsInserted,
-            [=]() { mergeFilesBtn->setEnabled(fileList->count() > 0); });
+            [=]() { doMergeBtn->setEnabled(fileList->count() > 0); });
 
     connect(fileList->model(), &QAbstractItemModel::rowsRemoved,
-            [=]() { mergeFilesBtn->setEnabled(fileList->count() > 0); });
+            [=]() { doMergeBtn->setEnabled(fileList->count() > 0); });
 
     mergePage->setLayout(layout);
 
@@ -116,10 +120,45 @@ void MainWindow::setUpMergePage() {
         fileList->setDefaultDropAction(Qt::MoveAction);
     });
 
+    connect(doMergeBtn, &QPushButton::clicked, this, &MainWindow::mergeFiles);
+
     connect(removeFilesBtn, &QPushButton::clicked, this,
             [=]() { delete fileList->takeItem(fileList->currentRow()); });
 }
 
-void MainWindow::mergeFiles() {}
+void MainWindow::mergeFiles() {
+    QString outputName = QFileDialog::getSaveFileName(
+        this, "Save Merged PDF", QDir::homePath(), "PDF Files (*.pdf)");
+
+    if (outputName.isEmpty())
+        return;
+
+    auto fileNums = fileList->count();
+    QProgressDialog *progress =
+        new QProgressDialog("Merging Files", "Cancel", 0, fileNums, this);
+    progress->setWindowModality(Qt::WindowModal);
+    progress->setMinimumSize(400, 200);
+    progress->show();
+
+    PoDoFo::PdfMemDocument out;
+
+    for (int i = 0; i < fileNums; i++) {
+        PoDoFo::PdfMemDocument src;
+        auto fileName = fileList->item(i)->text().toStdString();
+        src.Load(fileName);
+        out.GetPages().AppendDocumentPages(src);
+
+        if (progress->wasCanceled())
+            break;
+
+        progress->setValue(i);
+        QApplication::processEvents();
+        QThread::msleep(1000);
+    }
+
+    if (!progress->wasCanceled()) {
+        out.Save(outputName.toStdString());
+    }
+}
 
 MainWindow::~MainWindow() {}

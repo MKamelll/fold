@@ -13,5 +13,5 @@ OBJECTS_DIR = build
 CONFIG += link_pkgconfig
 PKGCONFIG += libpodofo
 
-HEADERS += mainwindow.hpp pdf.hpp
-SOURCES += main.cpp mainwindow.cpp pdf.cpp
+HEADERS += mainwindow.hpp
+SOURCES += main.cpp mainwindow.cpp

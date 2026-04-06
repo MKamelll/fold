@@ -38,7 +38,7 @@ private:
     QPushButton *extractTextBtn;
     QPushButton *addFilesBtn;
     QPushButton *removeFilesBtn;
-    QPushButton *mergeFilesBtn;
+    QPushButton *doMergeBtn;
     QPushButton *backToHomeBtn;
     QStackedWidget *stack;
     QListWidget *fileList;
