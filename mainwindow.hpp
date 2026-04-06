@@ -4,24 +4,17 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QStackedWidget>
+#include <QGridLayout>
 
-class MainWindow : public QMainWindow {
+class HomePage : public QWidget {
     Q_OBJECT
-
 public:
-    MainWindow(QWidget *parent = nullptr);
-    void setupHomePage();
-    void setUpMergePage();
-    ~MainWindow();
+    HomePage(QWidget *parent = nullptr);
 
-private slots:
-    void mergeFiles();
+signals:
+    void mergeOperation();
 
 private:
-    QWidget *homePage;
-    QWidget *mergePage;
-    QWidget *splitPage;
-    QWidget *extractTextPage;
     QPushButton *mergeBtn;
     QPushButton *splitBtn;
     QPushButton *compressBtn;
@@ -36,6 +29,25 @@ private:
     QPushButton *removePagesBtn;
     QPushButton *printBtn;
     QPushButton *extractTextBtn;
+    QGridLayout *grid;
+};
+
+class MainWindow : public QMainWindow {
+    Q_OBJECT
+
+public:
+    MainWindow(QWidget *parent = nullptr);
+    void setUpMergePage();
+    ~MainWindow();
+
+private slots:
+    void mergeFiles();
+
+private:
+    HomePage *homePage;
+    QWidget *mergePage;
+    QWidget *splitPage;
+    QWidget *extractTextPage;
     QPushButton *addFilesBtn;
     QPushButton *removeFilesBtn;
     QPushButton *doMergeBtn;

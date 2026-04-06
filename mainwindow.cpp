@@ -1,6 +1,5 @@
 #include "mainwindow.hpp"
 #include <QFileDialog>
-#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QSizePolicy>
@@ -13,36 +12,9 @@
 #include <QThread>
 #include <QApplication>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-
-    setWindowTitle("fold");
-    resize(480, 240);
-    stack = new QStackedWidget(this);
-
-    setCentralWidget(stack);
-
-    homePage = new QWidget;
-    mergePage = new QWidget;
-    splitPage = new QWidget;
-    extractTextPage = new QWidget;
-
-    stack->addWidget(homePage);
-    stack->addWidget(mergePage);
-    stack->addWidget(splitPage);
-    stack->addWidget(extractTextPage);
-
-    backToHomeBtn = new QPushButton("Home", this);
-    connect(backToHomeBtn, &QPushButton::clicked, this,
-            [=]() { stack->setCurrentWidget(homePage); });
-
-    setupHomePage();
-    setUpMergePage();
-    stack->setCurrentWidget(homePage);
-}
-
-void MainWindow::setupHomePage() {
-    QGridLayout *grid = new QGridLayout;
-    homePage->setLayout(grid);
+HomePage::HomePage(QWidget *parent) : QWidget(parent) {
+    grid = new QGridLayout(this);
+    setLayout(grid);
 
     mergeBtn = new QPushButton("Merge PDFs", this);
     splitBtn = new QPushButton("Split PDF", this);
@@ -79,6 +51,34 @@ void MainWindow::setupHomePage() {
     grid->addWidget(extractTextBtn, 4, 1);
 
     connect(mergeBtn, &QPushButton::clicked, this,
+            [=]() { emit mergeOperation(); });
+}
+
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+
+    setWindowTitle("fold");
+    resize(480, 240);
+    stack = new QStackedWidget(this);
+
+    setCentralWidget(stack);
+
+    homePage = new HomePage(this);
+    mergePage = new QWidget;
+    splitPage = new QWidget;
+    extractTextPage = new QWidget;
+
+    stack->addWidget(homePage);
+    stack->addWidget(mergePage);
+    stack->addWidget(splitPage);
+    stack->addWidget(extractTextPage);
+
+    backToHomeBtn = new QPushButton("Home", this);
+    connect(backToHomeBtn, &QPushButton::clicked, this,
+            [=]() { stack->setCurrentWidget(homePage); });
+
+    setUpMergePage();
+    stack->setCurrentWidget(homePage);
+    connect(homePage, &HomePage::mergeOperation, this,
             [=]() { stack->setCurrentWidget(mergePage); });
 }
 
