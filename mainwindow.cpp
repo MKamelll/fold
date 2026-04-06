@@ -7,7 +7,6 @@
 #include <QVBoxLayout>
 #include <QDialog>
 #include <QLabel>
-#include <QProgressDialog>
 #include <podofo/podofo.h>
 #include <QThread>
 #include <QApplication>
@@ -54,39 +53,14 @@ HomePage::HomePage(QWidget *parent) : QWidget(parent) {
             [=]() { emit mergeOperation(); });
 }
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-
-    setWindowTitle("fold");
-    resize(480, 240);
-    stack = new QStackedWidget(this);
-
-    setCentralWidget(stack);
-
-    homePage = new HomePage(this);
-    mergePage = new QWidget;
-    splitPage = new QWidget;
-    extractTextPage = new QWidget;
-
-    stack->addWidget(homePage);
-    stack->addWidget(mergePage);
-    stack->addWidget(splitPage);
-    stack->addWidget(extractTextPage);
-
-    backToHomeBtn = new QPushButton("Home", this);
-    connect(backToHomeBtn, &QPushButton::clicked, this,
-            [=]() { stack->setCurrentWidget(homePage); });
-
-    setUpMergePage();
-    stack->setCurrentWidget(homePage);
-    connect(homePage, &HomePage::mergeOperation, this,
-            [=]() { stack->setCurrentWidget(mergePage); });
-}
-
-void MainWindow::setUpMergePage() {
+MergePage::MergePage(QWidget *parent) : QWidget(parent) {
     addFilesBtn = new QPushButton("Add", this);
     removeFilesBtn = new QPushButton("Del", this);
     doMergeBtn = new QPushButton("Merge", this);
     doMergeBtn->setDisabled(true);
+    backToHomeBtn = new QPushButton("Home", this);
+    fileList = new QListWidget(this);
+    layout = new QVBoxLayout(this);
 
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(doMergeBtn);
@@ -95,16 +69,13 @@ void MainWindow::setUpMergePage() {
     hbox->addWidget(addFilesBtn);
     hbox->addWidget(removeFilesBtn);
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    fileList = new QListWidget;
-
     connect(fileList->model(), &QAbstractItemModel::rowsInserted,
             [=]() { doMergeBtn->setEnabled(fileList->count() > 0); });
 
     connect(fileList->model(), &QAbstractItemModel::rowsRemoved,
             [=]() { doMergeBtn->setEnabled(fileList->count() > 0); });
 
-    mergePage->setLayout(layout);
+    setLayout(layout);
 
     layout->addWidget(fileList);
     layout->addLayout(hbox);
@@ -120,13 +91,18 @@ void MainWindow::setUpMergePage() {
         fileList->setDefaultDropAction(Qt::MoveAction);
     });
 
-    connect(doMergeBtn, &QPushButton::clicked, this, &MainWindow::mergeFiles);
+    connect(doMergeBtn, &QPushButton::clicked, this, &MergePage::mergeFiles);
 
     connect(removeFilesBtn, &QPushButton::clicked, this,
             [=]() { delete fileList->takeItem(fileList->currentRow()); });
+
+    connect(backToHomeBtn, &QPushButton::clicked, this, [=]() {
+        fileList->clear();
+        emit navToHome();
+    });
 }
 
-void MainWindow::mergeFiles() {
+void MergePage::mergeFiles() {
     QString outputName = QFileDialog::getSaveFileName(
         this, "Save Merged PDF", QDir::homePath(), "PDF Files (*.pdf)");
 
@@ -134,10 +110,12 @@ void MainWindow::mergeFiles() {
         return;
 
     auto fileNums = fileList->count();
-    QProgressDialog *progress =
+    progress =
         new QProgressDialog("Merging Files", "Cancel", 0, fileNums, this);
     progress->setWindowModality(Qt::WindowModal);
     progress->setMinimumSize(400, 200);
+    progress->setAutoClose(false);
+    progress->setAutoReset(false);
     progress->show();
 
     PoDoFo::PdfMemDocument out;
@@ -151,14 +129,42 @@ void MainWindow::mergeFiles() {
         if (progress->wasCanceled())
             break;
 
-        progress->setValue(i);
+        progress->setValue(i + 1);
         QApplication::processEvents();
         QThread::msleep(1000);
     }
 
     if (!progress->wasCanceled()) {
         out.Save(outputName.toStdString());
+        progress->setLabelText("Completed!");
+        progress->setCancelButtonText("Close");
     }
+}
+
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+
+    setWindowTitle("fold");
+    resize(480, 240);
+    stack = new QStackedWidget(this);
+
+    setCentralWidget(stack);
+
+    homePage = new HomePage(this);
+    mergePage = new MergePage(this);
+    splitPage = new QWidget;
+    extractTextPage = new QWidget;
+
+    stack->addWidget(homePage);
+    stack->addWidget(mergePage);
+    stack->addWidget(splitPage);
+    stack->addWidget(extractTextPage);
+
+    stack->setCurrentWidget(homePage);
+    connect(homePage, &HomePage::mergeOperation, this,
+            [=]() { stack->setCurrentWidget(mergePage); });
+
+    connect(mergePage, &MergePage::navToHome, this,
+            [=]() { stack->setCurrentWidget(homePage); });
 }
 
 MainWindow::~MainWindow() {}

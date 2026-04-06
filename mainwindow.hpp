@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QGridLayout>
+#include <QProgressDialog>
 
 class HomePage : public QWidget {
     Q_OBJECT
@@ -32,26 +33,39 @@ private:
     QGridLayout *grid;
 };
 
-class MainWindow : public QMainWindow {
+class MergePage : public QWidget {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    void setUpMergePage();
-    ~MainWindow();
+    MergePage(QWidget *parent = nullptr);
+
+signals:
+    void navToHome();
 
 private slots:
     void mergeFiles();
 
 private:
-    HomePage *homePage;
-    QWidget *mergePage;
-    QWidget *splitPage;
-    QWidget *extractTextPage;
+    QVBoxLayout *layout;
     QPushButton *addFilesBtn;
     QPushButton *removeFilesBtn;
     QPushButton *doMergeBtn;
     QPushButton *backToHomeBtn;
-    QStackedWidget *stack;
+    QProgressDialog *progress;
     QListWidget *fileList;
+};
+
+class MainWindow : public QMainWindow {
+    Q_OBJECT
+
+public:
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
+
+private:
+    HomePage *homePage;
+    MergePage *mergePage;
+    QWidget *splitPage;
+    QWidget *extractTextPage;
+    QStackedWidget *stack;
 };
