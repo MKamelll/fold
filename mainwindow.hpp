@@ -7,6 +7,24 @@
 #include <QGridLayout>
 #include <QProgressDialog>
 
+class SplitPage : public QWidget {
+    Q_OBJECT
+public:
+    SplitPage(QWidget *parent = nullptr);
+
+signals:
+    void navToHome();
+
+private:
+    QVBoxLayout *layout;
+    QPushButton *addFilesBtn;
+    QPushButton *doSplitBtn;
+    QPushButton *removeFilesBtn;
+    QPushButton *backToHomeBtn;
+    QProgressDialog *progress;
+    QListWidget *fileList;
+};
+
 class HomePage : public QWidget {
     Q_OBJECT
 public:
@@ -14,6 +32,7 @@ public:
 
 signals:
     void mergeOperation();
+    void splitOperation();
 
 private:
     QPushButton *mergeBtn;
@@ -65,7 +84,7 @@ public:
 private:
     HomePage *homePage;
     MergePage *mergePage;
-    QWidget *splitPage;
+    SplitPage *splitPage;
     QWidget *extractTextPage;
     QStackedWidget *stack;
 };

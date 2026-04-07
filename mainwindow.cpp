@@ -11,6 +11,53 @@
 #include <QThread>
 #include <QApplication>
 
+SplitPage::SplitPage(QWidget *parent) : QWidget(parent) {
+    addFilesBtn = new QPushButton("Add", this);
+    removeFilesBtn = new QPushButton("Del", this);
+    doSplitBtn = new QPushButton("Split", this);
+    doSplitBtn->setDisabled(true);
+    backToHomeBtn = new QPushButton("Home", this);
+    fileList = new QListWidget(this);
+    layout = new QVBoxLayout(this);
+
+    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->addWidget(doSplitBtn);
+    hbox->addStretch(1);
+    hbox->addWidget(backToHomeBtn);
+    hbox->addWidget(addFilesBtn);
+    hbox->addWidget(removeFilesBtn);
+
+    connect(fileList->model(), &QAbstractItemModel::rowsInserted,
+            [=]() { doSplitBtn->setEnabled(fileList->count() > 0); });
+
+    connect(fileList->model(), &QAbstractItemModel::rowsRemoved,
+            [=]() { doSplitBtn->setEnabled(fileList->count() > 0); });
+
+    setLayout(layout);
+
+    layout->addWidget(fileList);
+    layout->addLayout(hbox);
+
+    connect(addFilesBtn, &QPushButton::clicked, this, [=]() {
+        QStringList files = QFileDialog::getOpenFileNames(
+            this, "Select Files", QDir::homePath(), "PDF Files (*.pdf)");
+
+        for (auto &file : files) {
+            fileList->addItem(file);
+        }
+        fileList->setDragDropMode(QAbstractItemView::InternalMove);
+        fileList->setDefaultDropAction(Qt::MoveAction);
+    });
+
+    connect(removeFilesBtn, &QPushButton::clicked, this,
+            [=]() { delete fileList->takeItem(fileList->currentRow()); });
+
+    connect(backToHomeBtn, &QPushButton::clicked, this, [=]() {
+        fileList->clear();
+        emit navToHome();
+    });
+}
+
 HomePage::HomePage(QWidget *parent) : QWidget(parent) {
     grid = new QGridLayout(this);
     setLayout(grid);
@@ -51,6 +98,9 @@ HomePage::HomePage(QWidget *parent) : QWidget(parent) {
 
     connect(mergeBtn, &QPushButton::clicked, this,
             [=]() { emit mergeOperation(); });
+
+    connect(splitBtn, &QPushButton::clicked, this,
+            [=]() { emit splitOperation(); });
 }
 
 MergePage::MergePage(QWidget *parent) : QWidget(parent) {
@@ -91,8 +141,6 @@ MergePage::MergePage(QWidget *parent) : QWidget(parent) {
         fileList->setDefaultDropAction(Qt::MoveAction);
     });
 
-    connect(doMergeBtn, &QPushButton::clicked, this, &MergePage::mergeFiles);
-
     connect(removeFilesBtn, &QPushButton::clicked, this,
             [=]() { delete fileList->takeItem(fileList->currentRow()); });
 
@@ -100,6 +148,8 @@ MergePage::MergePage(QWidget *parent) : QWidget(parent) {
         fileList->clear();
         emit navToHome();
     });
+
+    connect(doMergeBtn, &QPushButton::clicked, this, &MergePage::mergeFiles);
 }
 
 void MergePage::mergeFiles() {
@@ -151,7 +201,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     homePage = new HomePage(this);
     mergePage = new MergePage(this);
-    splitPage = new QWidget;
+    splitPage = new SplitPage(this);
     extractTextPage = new QWidget;
 
     stack->addWidget(homePage);
@@ -165,6 +215,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(mergePage, &MergePage::navToHome, this,
             [=]() { stack->setCurrentWidget(homePage); });
+
+    connect(splitPage, &SplitPage::navToHome, this,
+            [=]() { stack->setCurrentWidget(homePage); });
+
+    connect(homePage, &HomePage::splitOperation, this,
+            [=]() { stack->setCurrentWidget(splitPage); });
 }
 
 MainWindow::~MainWindow() {}
