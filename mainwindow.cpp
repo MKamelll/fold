@@ -19,6 +19,7 @@ SplitPage::SplitPage(QWidget *parent) : QWidget(parent) {
     backToHomeBtn = new QPushButton("Home", this);
     fileList = new QListWidget(this);
     layout = new QVBoxLayout(this);
+    spinBox = new QSpinBox(this);
 
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(doSplitBtn);
@@ -26,6 +27,14 @@ SplitPage::SplitPage(QWidget *parent) : QWidget(parent) {
     hbox->addWidget(backToHomeBtn);
     hbox->addWidget(addFilesBtn);
     hbox->addWidget(removeFilesBtn);
+
+    spinBox->setValue(1);
+    spinBox->setMinimum(1);
+
+    QHBoxLayout *hbox2 = new QHBoxLayout;
+    hbox2->addWidget(new QLabel("number of pages"));
+    hbox2->addWidget(spinBox);
+    hbox2->addStretch(1);
 
     connect(fileList->model(), &QAbstractItemModel::rowsInserted,
             [=]() { doSplitBtn->setEnabled(fileList->count() > 0); });
@@ -36,6 +45,7 @@ SplitPage::SplitPage(QWidget *parent) : QWidget(parent) {
     setLayout(layout);
 
     layout->addWidget(fileList);
+    layout->addLayout(hbox2);
     layout->addLayout(hbox);
 
     connect(addFilesBtn, &QPushButton::clicked, this, [=]() {

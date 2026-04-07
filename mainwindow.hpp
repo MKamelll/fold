@@ -6,6 +6,8 @@
 #include <QStackedWidget>
 #include <QGridLayout>
 #include <QProgressDialog>
+#include <QSpinBox>
+#include <QGroupBox>
 
 class SplitPage : public QWidget {
     Q_OBJECT
@@ -21,6 +23,7 @@ private:
     QPushButton *doSplitBtn;
     QPushButton *removeFilesBtn;
     QPushButton *backToHomeBtn;
+    QSpinBox *spinBox;
     QProgressDialog *progress;
     QListWidget *fileList;
 };
