@@ -17,13 +17,16 @@ public:
 signals:
     void navToHome();
 
+private slots:
+    void splitFile();
+
 private:
     QVBoxLayout *layout;
     QPushButton *addFilesBtn;
     QPushButton *doSplitBtn;
-    QPushButton *removeFilesBtn;
     QPushButton *backToHomeBtn;
-    QSpinBox *spinBox;
+    QSpinBox *toSpinBox;
+    QSpinBox *fromSpinBox;
     QProgressDialog *progress;
     QListWidget *fileList;
 };

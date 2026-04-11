@@ -10,36 +10,37 @@
 #include <podofo/podofo.h>
 #include <QThread>
 #include <QApplication>
+#include <QMessageBox>
 
 SplitPage::SplitPage(QWidget *parent) : QWidget(parent) {
     addFilesBtn = new QPushButton("Add", this);
-    removeFilesBtn = new QPushButton("Del", this);
     doSplitBtn = new QPushButton("Split", this);
     doSplitBtn->setDisabled(true);
     backToHomeBtn = new QPushButton("Home", this);
     fileList = new QListWidget(this);
     layout = new QVBoxLayout(this);
-    spinBox = new QSpinBox(this);
+    fromSpinBox = new QSpinBox(this);
+    toSpinBox = new QSpinBox(this);
 
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(doSplitBtn);
     hbox->addStretch(1);
     hbox->addWidget(backToHomeBtn);
     hbox->addWidget(addFilesBtn);
-    hbox->addWidget(removeFilesBtn);
 
-    spinBox->setValue(1);
-    spinBox->setMinimum(1);
+    toSpinBox->setValue(1);
+    toSpinBox->setMinimum(1);
+    fromSpinBox->setValue(1);
+    fromSpinBox->setMinimum(1);
 
     QHBoxLayout *hbox2 = new QHBoxLayout;
-    hbox2->addWidget(new QLabel("number of pages"));
-    hbox2->addWidget(spinBox);
+    hbox2->addWidget(new QLabel("From"));
+    hbox2->addWidget(fromSpinBox);
     hbox2->addStretch(1);
+    hbox2->addWidget(new QLabel("To"));
+    hbox2->addWidget(toSpinBox);
 
     connect(fileList->model(), &QAbstractItemModel::rowsInserted,
-            [=]() { doSplitBtn->setEnabled(fileList->count() > 0); });
-
-    connect(fileList->model(), &QAbstractItemModel::rowsRemoved,
             [=]() { doSplitBtn->setEnabled(fileList->count() > 0); });
 
     setLayout(layout);
@@ -49,23 +50,70 @@ SplitPage::SplitPage(QWidget *parent) : QWidget(parent) {
     layout->addLayout(hbox);
 
     connect(addFilesBtn, &QPushButton::clicked, this, [=]() {
-        QStringList files = QFileDialog::getOpenFileNames(
-            this, "Select Files", QDir::homePath(), "PDF Files (*.pdf)");
+        QString file = QFileDialog::getOpenFileName(
+            this, "Select A File", QDir::homePath(), "PDF Files (*.pdf)");
 
-        for (auto &file : files) {
-            fileList->addItem(file);
-        }
-        fileList->setDragDropMode(QAbstractItemView::InternalMove);
-        fileList->setDefaultDropAction(Qt::MoveAction);
+        if (file.isEmpty())
+            return;
+
+        fileList->clear();
+        fileList->addItem(file);
+        fileList->setCurrentRow(0);
     });
-
-    connect(removeFilesBtn, &QPushButton::clicked, this,
-            [=]() { delete fileList->takeItem(fileList->currentRow()); });
 
     connect(backToHomeBtn, &QPushButton::clicked, this, [=]() {
         fileList->clear();
         emit navToHome();
     });
+
+    connect(doSplitBtn, &QPushButton::clicked, this, &SplitPage::splitFile);
+}
+
+void SplitPage::splitFile() {
+    QString outputName = QFileDialog::getSaveFileName(
+        this, "Save Splitted File", QDir::homePath(), "PDF Files (*.pdf)");
+
+    if (outputName.isEmpty())
+        return;
+
+    outputName.push_back(".pdf");
+
+    size_t fromPage = fromSpinBox->value();
+    size_t toPage = toSpinBox->value();
+    PoDoFo::PdfMemDocument src;
+    auto fileName = fileList->item(0)->text().toStdString();
+    src.Load(fileName);
+
+    if (toPage > src.GetPages().GetCount()) {
+        QMessageBox::information(
+            this, "Info", "Range Is Out Of The Document Available Page Count");
+        return;
+    }
+
+    progress = new QProgressDialog("Spliting The File", "Cancel", fromPage,
+                                   toPage, this);
+    progress->setWindowModality(Qt::WindowModal);
+    progress->setMinimumSize(400, 200);
+    progress->setAutoClose(false);
+    progress->setAutoReset(false);
+    progress->show();
+
+    PoDoFo::PdfMemDocument out;
+    for (size_t i = fromPage - 1; i < toPage; i++) {
+        out.GetPages().AppendDocumentPages(src, i, 1);
+        if (progress->wasCanceled())
+            break;
+
+        progress->setValue(i + 1);
+        QApplication::processEvents();
+        QThread::msleep(1000);
+    }
+
+    if (!progress->wasCanceled()) {
+        out.Save(outputName.toStdString());
+        progress->setLabelText("Completed!");
+        progress->setCancelButtonText("Close");
+    }
 }
 
 HomePage::HomePage(QWidget *parent) : QWidget(parent) {
@@ -168,6 +216,8 @@ void MergePage::mergeFiles() {
 
     if (outputName.isEmpty())
         return;
+
+    outputName.push_back(".pdf");
 
     auto fileNums = fileList->count();
     progress =
