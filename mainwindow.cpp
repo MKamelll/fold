@@ -159,6 +159,14 @@ HomePage::HomePage(QWidget *parent) : QWidget(parent) {
 
     connect(splitBtn, &QPushButton::clicked, this,
             [=]() { emit splitOperation(); });
+
+    connect(editBtn, &QPushButton::clicked, this, [=]() {
+        QMessageBox::information(this, "Info", "Editing Is Not Supported Yet");
+    });
+
+    connect(signBtn, &QPushButton::clicked, this, [=]() {
+        QMessageBox::information(this, "Info", "Signing Is Not Supported Yet");
+    });
 }
 
 MergePage::MergePage(QWidget *parent) : QWidget(parent) {
