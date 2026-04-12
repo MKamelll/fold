@@ -13,17 +13,6 @@ signals:
 private:
     QPushButton *mergeBtn;
     QPushButton *splitBtn;
-    QPushButton *compressBtn;
-    QPushButton *editBtn;
-    QPushButton *signBtn;
-    QPushButton *convertBtn;
-    QPushButton *fromImagesBtn;
-    QPushButton *extractImagesBtn;
-    QPushButton *lockBtn;
-    QPushButton *unLockBtn;
-    QPushButton *rotatePagesBtn;
-    QPushButton *removePagesBtn;
-    QPushButton *printBtn;
-    QPushButton *extractTextBtn;
+    QPushButton *reorderBtn;
     QGridLayout *grid;
 };
