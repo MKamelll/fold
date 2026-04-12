@@ -1,0 +1,22 @@
+#pragma once
+
+#include <QListWidget>
+#include <QMainWindow>
+#include <QPushButton>
+#include <QStackedWidget>
+#include <QGridLayout>
+#include <QProgressDialog>
+#include <QSpinBox>
+#include <QGroupBox>
+#include <QFileDialog>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QSizePolicy>
+#include <QStackedWidget>
+#include <QVBoxLayout>
+#include <QDialog>
+#include <QLabel>
+#include <podofo/podofo.h>
+#include <QThread>
+#include <QApplication>
+#include <QMessageBox>
