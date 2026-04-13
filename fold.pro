@@ -13,11 +13,15 @@ OBJECTS_DIR = build
 CONFIG += link_pkgconfig
 PKGCONFIG += libpodofo poppler-qt6
 
+CONFIG+=fontAwesomeFree
+include(QtAwesome/QtAwesome.pri)
+
 HEADERS += mainwindow.hpp \
         mergepage.hpp \
         splitpage.hpp \
         homepage.hpp \
-        reorderpage.hpp
+        reorderpage.hpp \
+        awesome.hpp
 
 SOURCES += main.cpp \
         mainwindow.cpp \

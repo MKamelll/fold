@@ -1,6 +1,6 @@
 #pragma once
 #include <QWidget>
-#include <QPushButton>
+#include <QToolButton>
 #include <QGridLayout>
 
 class HomePage : public QWidget {
@@ -14,8 +14,8 @@ signals:
     void reorderOperation();
 
 private:
-    QPushButton *mergeBtn;
-    QPushButton *splitBtn;
-    QPushButton *reorderBtn;
+    QToolButton *mergeBtn;
+    QToolButton *splitBtn;
+    QToolButton *reorderBtn;
     QGridLayout *grid;
 };
