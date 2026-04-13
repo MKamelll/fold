@@ -1,4 +1,10 @@
 #include "mainwindow.hpp"
+#include <QFileDialog>
+#include <QDir>
+#include <QMessageBox>
+#include <podofo/podofo.h>
+#include <QApplication>
+#include <QThread>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
@@ -11,12 +17,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     homePage = new HomePage(this);
     mergePage = new MergePage(this);
     splitPage = new SplitPage(this);
-    extractTextPage = new QWidget;
+    reorderPage = new ReorderPage(this);
 
     stack->addWidget(homePage);
     stack->addWidget(mergePage);
     stack->addWidget(splitPage);
-    stack->addWidget(extractTextPage);
+    stack->addWidget(reorderPage);
 
     stack->setCurrentWidget(homePage);
     connect(homePage, &HomePage::mergeOperation, this,
@@ -28,8 +34,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(splitPage, &SplitPage::navToHome, this,
             [=]() { stack->setCurrentWidget(homePage); });
 
+    connect(reorderPage, &ReorderPage::navToHome, this,
+            [=]() { stack->setCurrentWidget(homePage); });
+
     connect(homePage, &HomePage::splitOperation, this,
             [=]() { stack->setCurrentWidget(splitPage); });
+
+    connect(homePage, &HomePage::reorderOperation, this,
+            [=]() { stack->setCurrentWidget(reorderPage); });
 }
 
 MainWindow::~MainWindow() {}

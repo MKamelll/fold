@@ -1,8 +1,12 @@
 #pragma once
-#include "common.hpp"
 #include "mergepage.hpp"
 #include "splitpage.hpp"
 #include "homepage.hpp"
+#include "reorderpage.hpp"
+
+#include <QStackedWidget>
+#include <QMainWindow>
+#include <poppler-qt6.h>
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -15,6 +19,6 @@ private:
     HomePage *homePage;
     MergePage *mergePage;
     SplitPage *splitPage;
-    QWidget *extractTextPage;
+    ReorderPage *reorderPage;
     QStackedWidget *stack;
 };

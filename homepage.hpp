@@ -1,5 +1,7 @@
 #pragma once
-#include "common.hpp"
+#include <QWidget>
+#include <QPushButton>
+#include <QGridLayout>
 
 class HomePage : public QWidget {
     Q_OBJECT
@@ -9,6 +11,7 @@ public:
 signals:
     void mergeOperation();
     void splitOperation();
+    void reorderOperation();
 
 private:
     QPushButton *mergeBtn;

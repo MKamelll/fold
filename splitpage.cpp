@@ -1,4 +1,11 @@
 #include "splitpage.hpp"
+#include <QFileDialog>
+#include <QDir>
+#include <QMessageBox>
+#include <podofo/podofo.h>
+#include <QApplication>
+#include <QThread>
+#include <QLabel>
 
 SplitPage::SplitPage(QWidget *parent) : QWidget(parent) {
     addFilesBtn = new QPushButton("Add", this);

@@ -1,28 +1,30 @@
 #pragma once
 #include <QWidget>
+#include <poppler-qt6.h>
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QProgressDialog>
 #include <QListWidget>
 
-class MergePage : public QWidget {
+class ReorderPage : public QWidget {
     Q_OBJECT
-
 public:
-    MergePage(QWidget *parent = nullptr);
+    ReorderPage(QWidget *parent = nullptr);
+    QImage renderThumbnail(Poppler::Document *doc, int pageIndex,
+                           int width = 300);
 
 signals:
     void navToHome();
 
 private slots:
-    void mergeFiles();
+    void reorderFile();
 
 private:
     QVBoxLayout *layout;
     QPushButton *addFilesBtn;
-    QPushButton *removeFilesBtn;
-    QPushButton *doMergeBtn;
+    QPushButton *doReorderBtn;
     QPushButton *backToHomeBtn;
     QProgressDialog *progress;
     QListWidget *fileList;
+    QString file;
 };

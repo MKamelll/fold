@@ -17,4 +17,7 @@ HomePage::HomePage(QWidget *parent) : QWidget(parent) {
 
     connect(splitBtn, &QPushButton::clicked, this,
             [=]() { emit splitOperation(); });
+
+    connect(reorderBtn, &QPushButton::clicked, this,
+            [=]() { emit reorderOperation(); });
 }

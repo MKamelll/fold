@@ -1,5 +1,10 @@
 #pragma once
-#include "common.hpp"
+#include <QWidget>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QProgressDialog>
+#include <QListWidget>
 
 class SplitPage : public QWidget {
     Q_OBJECT

@@ -11,15 +11,17 @@ MOC_DIR = build
 OBJECTS_DIR = build
 
 CONFIG += link_pkgconfig
-PKGCONFIG += libpodofo
+PKGCONFIG += libpodofo poppler-qt6
 
 HEADERS += mainwindow.hpp \
         mergepage.hpp \
         splitpage.hpp \
-        homepage.hpp
+        homepage.hpp \
+        reorderpage.hpp
 
 SOURCES += main.cpp \
         mainwindow.cpp \
         mergepage.cpp \
         splitpage.cpp \
-        homepage.cpp
+        homepage.cpp \
+        reorderpage.cpp

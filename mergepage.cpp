@@ -1,4 +1,10 @@
 #include "mergepage.hpp"
+#include <QFileDialog>
+#include <QDir>
+#include <QMessageBox>
+#include <podofo/podofo.h>
+#include <QApplication>
+#include <QThread>
 
 MergePage::MergePage(QWidget *parent) : QWidget(parent) {
     addFilesBtn = new QPushButton("Add", this);
