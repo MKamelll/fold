@@ -26,9 +26,17 @@ HomePage::HomePage(QWidget *parent) : QWidget(parent) {
     reorderBtn->setText("Reorder PDF");
     reorderBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
+    deleteBtn = new QToolButton(this);
+    deleteBtn->setIcon(
+        Awesome::instance()->icon(fa::fa_solid, fa::fa_file_circle_minus));
+    deleteBtn->setIconSize(QSize(50, 50));
+    deleteBtn->setText("Delete Pages PDF");
+    deleteBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
     grid->addWidget(mergeBtn, 0, 0);
     grid->addWidget(splitBtn, 0, 1);
     grid->addWidget(reorderBtn, 0, 2);
+    grid->addWidget(deleteBtn, 1, 0);
 
     connect(mergeBtn, &QToolButton::clicked, this,
             [=]() { emit mergeOperation(); });
@@ -38,4 +46,7 @@ HomePage::HomePage(QWidget *parent) : QWidget(parent) {
 
     connect(reorderBtn, &QToolButton::clicked, this,
             [=]() { emit reorderOperation(); });
+
+    connect(deleteBtn, &QToolButton::clicked, this,
+            [=]() { emit deleteOperation(); });
 }

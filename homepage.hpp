@@ -12,10 +12,12 @@ signals:
     void mergeOperation();
     void splitOperation();
     void reorderOperation();
+    void deleteOperation();
 
 private:
     QToolButton *mergeBtn;
     QToolButton *splitBtn;
     QToolButton *reorderBtn;
+    QToolButton *deleteBtn;
     QGridLayout *grid;
 };
