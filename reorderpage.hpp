@@ -26,5 +26,5 @@ private:
     QPushButton *backToHomeBtn;
     QProgressDialog *progress;
     QListWidget *fileList;
-    QString file;
+    QString filePath;
 };

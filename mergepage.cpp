@@ -62,7 +62,8 @@ void MergePage::mergeFiles() {
     if (outputName.isEmpty())
         return;
 
-    outputName.push_back(".pdf");
+    if (!outputName.endsWith(".pdf", Qt::CaseInsensitive))
+        outputName.append(".pdf");
 
     auto fileNums = fileList->count();
     progress =

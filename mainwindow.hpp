@@ -21,12 +21,16 @@ private slots:
     void deletePages();
 
 private:
+    QImage renderThumbnail(Poppler::Document *doc, int pageIndex,
+                           int width = 300);
+
     QVBoxLayout *layout;
     QPushButton *addFileBtn;
     QPushButton *doDeleteBtn;
     QPushButton *backToHomeBtn;
     QProgressDialog *progress;
     QListWidget *fileList;
+    QString filePath;
 };
 
 class MainWindow : public QMainWindow {

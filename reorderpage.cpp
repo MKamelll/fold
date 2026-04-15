@@ -37,14 +37,14 @@ ReorderPage::ReorderPage(QWidget *parent) : QWidget(parent) {
     fileList->setDefaultDropAction(Qt::MoveAction);
 
     connect(addFilesBtn, &QPushButton::clicked, this, [=]() {
-        file = QFileDialog::getOpenFileName(
+        filePath = QFileDialog::getOpenFileName(
             this, "Select A File", QDir::homePath(), "PDF Files (*.pdf)");
 
-        if (file.isEmpty())
+        if (filePath.isEmpty())
             return;
 
         fileList->clear();
-        auto doc = Poppler::Document::load(file);
+        auto doc = Poppler::Document::load(filePath);
 
         for (int i = 0; i < doc->numPages(); i++) {
             QImage img = renderThumbnail(doc.get(), i);
@@ -93,7 +93,8 @@ void ReorderPage::reorderFile() {
     if (outputName.isEmpty())
         return;
 
-    outputName.push_back(".pdf");
+    if (!outputName.endsWith(".pdf", Qt::CaseInsensitive))
+        outputName.append(".pdf");
 
     auto pageNum = fileList->count();
     progress =
@@ -106,7 +107,7 @@ void ReorderPage::reorderFile() {
 
     PoDoFo::PdfMemDocument out;
     PoDoFo::PdfMemDocument src;
-    src.Load(file.toStdString());
+    src.Load(filePath.toStdString());
 
     for (int i = 0; i < pageNum; i++) {
         int pageIndex = fileList->item(i)->data(Qt::UserRole).toInt();

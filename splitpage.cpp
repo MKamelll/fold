@@ -71,7 +71,8 @@ void SplitPage::splitFile() {
     if (outputName.isEmpty())
         return;
 
-    outputName.push_back(".pdf");
+    if (!outputName.endsWith(".pdf", Qt::CaseInsensitive))
+        outputName.append(".pdf");
 
     size_t fromPage = fromSpinBox->value();
     size_t toPage = toSpinBox->value();
