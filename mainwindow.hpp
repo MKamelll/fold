@@ -3,35 +3,12 @@
 #include "splitpage.hpp"
 #include "homepage.hpp"
 #include "reorderpage.hpp"
+#include "deletepage.hpp"
 
 #include <QStackedWidget>
 #include <QMainWindow>
 #include <poppler-qt6.h>
 
-class DeletePage : public QWidget {
-    Q_OBJECT
-
-public:
-    DeletePage(QWidget *parent = nullptr);
-
-signals:
-    void navToHome();
-
-private slots:
-    void deletePages();
-
-private:
-    QImage renderThumbnail(Poppler::Document *doc, int pageIndex,
-                           int width = 300);
-
-    QVBoxLayout *layout;
-    QPushButton *addFileBtn;
-    QPushButton *doDeleteBtn;
-    QPushButton *backToHomeBtn;
-    QProgressDialog *progress;
-    QListWidget *fileList;
-    QString filePath;
-};
 
 class MainWindow : public QMainWindow {
     Q_OBJECT

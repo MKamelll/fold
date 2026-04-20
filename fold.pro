@@ -21,6 +21,7 @@ HEADERS += mainwindow.hpp \
         splitpage.hpp \
         homepage.hpp \
         reorderpage.hpp \
+        deletepage.hpp \
         awesome.hpp
 
 SOURCES += main.cpp \
@@ -28,4 +29,5 @@ SOURCES += main.cpp \
         mergepage.cpp \
         splitpage.cpp \
         homepage.cpp \
+        deletepage.cpp \
         reorderpage.cpp
