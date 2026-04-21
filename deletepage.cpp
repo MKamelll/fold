@@ -103,13 +103,14 @@ void DeletePage::deletePages() {
 
         progress->setValue(i + 1);
         QApplication::processEvents();
-        QThread::msleep(1000);
     }
 
     if (!progress->wasCanceled()) {
         out.Save(outputName.toStdString());
         progress->setLabelText("Completed!");
+        QApplication::processEvents();
         progress->setCancelButtonText("Close");
+        QApplication::processEvents();
     }
 }
 

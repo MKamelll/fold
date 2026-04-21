@@ -87,7 +87,6 @@ void MergePage::mergeFiles() {
 
         progress->setValue(i + 1);
         QApplication::processEvents();
-        QThread::msleep(1000);
     }
 
     if (!progress->wasCanceled()) {
